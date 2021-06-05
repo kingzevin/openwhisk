@@ -253,6 +253,8 @@ object TransactionId {
   private val dict = ('A' to 'Z') ++ ('a' to 'z') ++ ('0' to '9')
 
   def apply(tid: String, extraLogging: Boolean = false): TransactionId = {
+    // zevin: TransactionMetadata(.., now, ...) 
+    // the "now" equals transid.meta.start
     val now = Instant.now(Clock.systemUTC()).inMills
     TransactionId(TransactionMetadata(tid, now, extraLogging))
   }

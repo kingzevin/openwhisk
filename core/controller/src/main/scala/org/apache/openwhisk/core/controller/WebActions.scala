@@ -47,7 +47,7 @@ import spray.json._
 import spray.json.DefaultJsonProtocol._
 import WhiskWebActionsApi.MediaExtension
 import RestApiCommons.{jsonPrettyResponsePrinter => jsonPrettyPrinter}
-import org.apache.openwhisk.common.TransactionId
+import org.apache.openwhisk.common.{Logging, TransactionId} // zevin
 import org.apache.openwhisk.core.controller.actions.PostActionActivation
 import org.apache.openwhisk.core.database._
 import org.apache.openwhisk.core.entitlement.{Collection, Privilege, Resource}
@@ -142,7 +142,7 @@ private case class Context(propertyMap: WebApiDirectives,
 }
 
 protected[core] object WhiskWebActionsApi extends Directives {
-
+  implicit var log: Logging = null // zevin
   private val mediaTranscoders = {
     // extensions are expected to contain only [a-z]
     Seq(
@@ -162,7 +162,9 @@ protected[core] object WhiskWebActionsApi extends Directives {
    * If name ends with ".xxxx" which matches a known extension, accept it as the extension.
    * Otherwise, the extension is ".http" by definition unless enforcing the presence of an extension.
    */
-  def mediaTranscoderForName(name: String, enforceExtension: Boolean): (String, Option[MediaExtension]) = {
+  // zevin: logging: Logging
+  def mediaTranscoderForName(name: String, enforceExtension: Boolean, logging: Logging): (String, Option[MediaExtension]) = {
+    log = logging // zevin
     mediaTranscoders
       .find(mt => name.endsWith(mt.extension))
       .map { mt =>
@@ -339,7 +341,8 @@ protected[core] object WhiskWebActionsApi extends Directives {
     }
   }
 
-  private def interpretHttpResponse(code: StatusCode, headers: List[RawHeader], str: String, transid: TransactionId) = {
+  // zevin: (implicit logging: Logging)
+  private def interpretHttpResponse(code: StatusCode, headers: List[RawHeader], str: String, transid: TransactionId)(implicit logging: Logging) = {
     findContentTypeInHeader(headers, transid, `text/html`).flatMap { mediaType =>
       val ct = ContentType(mediaType, () => HttpCharsets.`UTF-8`)
       ct match {
@@ -355,6 +358,8 @@ protected[core] object WhiskWebActionsApi extends Directives {
       }
     } match {
       case Success(entity) =>
+        // zevin: [TimeStamp] controller_sends_result
+        logging.info(this, s"tid=[${transid.meta.id}]. zevin: [TimeStamp] controller_sends_result. ${System.currentTimeMillis()}ms")
         respondWithHeaders(removeContentTypeHeader(headers)) {
           complete(code, entity)
         }
@@ -484,7 +489,8 @@ trait WhiskWebActionsApi
       namespace.addPath(pkgName).addPath(EntityName(actionName)).toFullyQualifiedEntityName
     }
 
-    provide(WhiskWebActionsApi.mediaTranscoderForName(actionNameWithExtension, webApiDirectives.enforceExtension)) {
+    // zevin: logging
+    provide(WhiskWebActionsApi.mediaTranscoderForName(actionNameWithExtension, webApiDirectives.enforceExtension, logging)) {
       case (actionName, Some(extension)) =>
         // extract request context, checks for overrides of reserved properties, and constructs action arguments
         // as the context body which may be the incoming request when the content type is JSON or formdata, or

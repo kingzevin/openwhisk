@@ -185,6 +185,8 @@ abstract class CommonLoadBalancer(config: WhiskConfig,
       LoggingMarkers.CONTROLLER_KAFKA,
       s"posting topic '$topic' with activation id '${msg.activationId}'",
       logLevel = InfoLevel)
+    // zevin: [TimeStamp] controller_produces to kafka
+    logging.info(this, s"zevin: [TimeStamp] controller_produces. ${System.currentTimeMillis()}ms")
 
     producer.send(topic, msg).andThen {
       case Success(status) =>
@@ -205,8 +207,11 @@ abstract class CommonLoadBalancer(config: WhiskConfig,
   protected[loadBalancer] def processAcknowledgement(bytes: Array[Byte]): Future[Unit] = Future {
     val raw = new String(bytes, StandardCharsets.UTF_8)
     AcknowledegmentMessage.parse(raw) match {
+      // zevin: here, parse the message from kafka
       case Success(acknowledegment) =>
         acknowledegment.isSlotFree.foreach { instance =>
+          // zevin: [TimeStamp] controller_gets_completion from kafka
+          logging.info(this, s"tid=[${acknowledegment.transid.meta.id}]zevin: [TimeStamp] controller_gets_completion. ${System.currentTimeMillis()}ms")
           processCompletion(
             acknowledegment.activationId,
             acknowledegment.transid,
@@ -216,6 +221,8 @@ abstract class CommonLoadBalancer(config: WhiskConfig,
         }
 
         acknowledegment.result.foreach { response =>
+          // zevin: [TimeStamp] controller_gets_result from kafka
+          logging.info(this, s"tid=[${acknowledegment.transid.meta.id}]zevin: [TimeStamp] controller_gets_result. ${System.currentTimeMillis()}ms")
           processResult(acknowledegment.activationId, acknowledegment.transid, response)
         }
 
@@ -239,6 +246,7 @@ abstract class CommonLoadBalancer(config: WhiskConfig,
     // The activation will be removed from the activation slots later, when the completion message
     // is received (because the slot in the invoker is not yet free for new activations).
     activationPromises.remove(aid).foreach(_.trySuccess(response))
+    // zevin: [log] received result ack for
     logging.info(this, s"received result ack for '$aid'")(tid)
   }
 

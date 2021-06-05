@@ -16,17 +16,23 @@
         "nodejs": [
             {
                 "kind": "nodejs:10",
-                "default": false,
+                "default": true,
                 "image": {
                     "prefix": "openwhisk",
                     "name": "action-nodejs-v10",
                     "tag": "nightly"
                 },
-                "deprecated": true,
+                "deprecated": false,
                 "attached": {
                     "attachmentName": "codefile",
                     "attachmentType": "text/plain"
-                }
+                },
+                "stemCells": [
+                    {
+                        "count": 1,
+                        "memory": "256 MB"
+                    }
+                ]
             },
             {
                 "kind": "nodejs:12",
@@ -44,7 +50,7 @@
             },
             {
                 "kind": "nodejs:14",
-                "default": true,
+                "default": false,
                 "image": {
                     "prefix": "openwhisk",
                     "name": "action-nodejs-v14",
@@ -68,6 +74,66 @@
                         }
                     }
                 ]
+            },
+            {
+                "kind": "nodejs:10aspell",
+                "default": false,
+                "image": {
+                    "prefix": "kingzevin",
+                    "name": "nodejs10aspell",
+                    "tag": "20.4.10"
+                },
+                "deprecated": false,
+                "attached": {
+                    "attachmentName": "codefile",
+                    "attachmentType": "text/plain"
+                },
+                "stemCells": [
+                    {
+                        "count": 1,
+                        "memory": "256 MB"
+                    }
+                ]
+            },
+            {
+                "kind": "nodejs:10web",
+                "default": false,
+                "image": {
+                    "prefix": "kingzevin",
+                    "name": "nodejs10web",
+                    "tag": "20.6.22"
+                },
+                "deprecated": false,
+                "attached": {
+                    "attachmentName": "codefile",
+                    "attachmentType": "text/plain"
+                },
+                "stemCells": [
+                    {
+                        "count": 1,
+                        "memory": "256 MB"
+                    }
+                ]
+            },
+            {
+                "kind": "nodejs:10tex",
+                "default": false,
+                "image": {
+                    "prefix": "kingzevin",
+                    "name": "nodejs10tex",
+                    "tag": "20.4.10"
+                },
+                "deprecated": false,
+                "attached": {
+                    "attachmentName": "codefile",
+                    "attachmentType": "text/plain"
+                },
+                "stemCells": [
+                    {
+                        "count": 1,
+                        "memory": "256 MB"
+                    }
+                ]
             }
         ],
         "python": [
@@ -77,50 +143,6 @@
                 "image": {
                     "prefix": "openwhisk",
                     "name": "actionloop-python-v3.7",
-                    "tag": "nightly"
-                },
-                "deprecated": false,
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                }
-            }
-        ],
-        "swift": [
-            {
-                "kind": "swift:4.2",
-                "default": false,
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-swift-v4.2",
-                    "tag": "nightly"
-                },
-                "deprecated": false,
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                }
-            },
-            {
-                "kind": "swift:5.1",
-                "default": false,
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-swift-v5.1",
-                    "tag": "nightly"
-                },
-                "deprecated": false,
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                }
-            },
-            {
-                "kind": "swift:5.3",
-                "default": true,
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-swift-v5.3",
                     "tag": "nightly"
                 },
                 "deprecated": false,
@@ -149,36 +171,8 @@
         ],
         "php": [
             {
-                "kind": "php:7.3",
-                "default": false,
-                "deprecated": false,
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-php-v7.3",
-                    "tag": "nightly"
-                },
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                }
-            },
-            {
-                "kind": "php:7.4",
-                "default": true,
-                "deprecated": false,
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-php-v7.4",
-                    "tag": "nightly"
-                },
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                }
-            },
-            {
                 "kind": "php:8.0",
-                "default": false,
+                "default": true,
                 "deprecated": false,
                 "image": {
                     "prefix": "openwhisk",
@@ -188,22 +182,6 @@
                 "attached": {
                     "attachmentName": "codefile",
                     "attachmentType": "text/plain"
-                }
-            }
-        ],
-        "ruby": [
-            {
-                "kind": "ruby:2.5",
-                "default": true,
-                "deprecated": false,
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                },
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-ruby-v2.5",
-                    "tag": "nightly"
                 }
             }
         ],
@@ -263,22 +241,6 @@
                     "name": "action-dotnet-v3.1",
                     "tag": "nightly"
                 },
-                "attached": {
-                    "attachmentName": "codefile",
-                    "attachmentType": "text/plain"
-                }
-            }
-        ],
-        "ballerina": [
-            {
-                "kind": "ballerina:0.990",
-                "default": true,
-                "image": {
-                    "prefix": "openwhisk",
-                    "name": "action-ballerina-v0.990.2",
-                    "tag": "nightly"
-                },
-                "deprecated": false,
                 "attached": {
                     "attachmentName": "codefile",
                     "attachmentType": "text/plain"

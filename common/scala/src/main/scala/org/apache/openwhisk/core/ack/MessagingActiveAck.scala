@@ -42,6 +42,8 @@ class MessagingActiveAck(producer: MessageProducer, instance: InstanceId, eventS
     implicit val transid: TransactionId = tid
 
     def send(msg: AcknowledegmentMessage, recovery: Boolean = false) = {
+      // zevin: [TimeStamp] invoker_produces result / completion
+      logging.info(this, s"zevin: [TimeStamp] invoker_produces ${msg.messageType}. ${System.currentTimeMillis()}ms")
       producer.send(topic = topicPrefix + "completed" + controllerInstance.asString, msg).andThen {
         case Success(_) =>
           val info = if (recovery) s"recovery ${msg.messageType}" else msg.messageType

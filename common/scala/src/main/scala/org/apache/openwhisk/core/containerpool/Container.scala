@@ -114,6 +114,7 @@ trait Container {
                  timeout: FiniteDuration,
                  maxConcurrent: Int,
                  entity: Option[WhiskAction] = None)(implicit transid: TransactionId): Future[Interval] = {
+    // zevin: "start" of the initTime
     val start = transid.started(
       this,
       LoggingMarkers.INVOKER_ACTIVATION_INIT,
@@ -158,6 +159,7 @@ trait Container {
           maxConcurrent: Int,
           reschedule: Boolean = false)(implicit transid: TransactionId): Future[(Interval, ActivationResponse)] = {
     val actionName = environment.fields.get("action_name").map(_.convertTo[String]).getOrElse("")
+    // zevin: "start" in the activation log
     val start =
       transid.started(
         this,
@@ -170,6 +172,8 @@ trait Container {
     callContainer("/run", body, timeout, maxConcurrent, retry = false, reschedule)
       .andThen { // never fails
         case Success(r: RunResult) =>
+          // zevin: [TimeStamp] invoker_gets_result: OK
+          logging.info(this, s"zevin: [TimeStamp] invoker_gets_result. ${System.currentTimeMillis()}ms")
           transid.finished(
             this,
             start.copy(start = r.interval.start),

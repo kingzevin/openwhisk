@@ -221,6 +221,8 @@ class InvokerReactive(
 
   /** Is called when an ActivationMessage is read from Kafka */
   def processActivationMessage(bytes: Array[Byte]): Future[Unit] = {
+    // zevin: [TimeStamp], invoker_gets_activation from kafka
+    logging.info(this, s"zevin: [TimeStamp] invoker_gets_activation. ${System.currentTimeMillis()}ms")
     Future(ActivationMessage.parse(new String(bytes, StandardCharsets.UTF_8)))
       .flatMap(Future.fromTry)
       .flatMap { msg =>

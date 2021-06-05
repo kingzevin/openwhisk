@@ -200,6 +200,7 @@ case class LimitedWhiskEntityPut(exec: Option[Exec] = None,
                                  annotations: Option[Parameters] = None) {
 
   def isWithinSizeLimits: Option[SizeError] = {
+  // zevin: sizeLimit
     exec.flatMap { e =>
       val is = e.size
       if (is <= Exec.sizeLimit) None
